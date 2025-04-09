@@ -16,25 +16,26 @@ class DurationCurve():
         linestyle = ['-', '--', ':', '-.', '-']  
 
         for i, y in enumerate(self.years):
-            data = DataGeneration(year = y, region = self.region).data
+            data = DataGeneration(year = y, region = self.region)
+            data_offshore_wind = data.offshore_wind
+            data_onshore_wind = data.onshore_wind
+            data_solar = data.solar
 
-            data_sorted_wind_on= data.sort_values(by = 'wind_onshore_profile', ascending = False, ignore_index = True)
-            if not self.region == 'NO':
-                data_sorted_wind_off = data.sort_values(by = 'wind_offshore_profile', ascending = False, ignore_index=True)
-                data_sorted_solar = data.sort_values(by = 'solar_profile', ascending = False, ignore_index = True)
+            data_sorted_wind_on = data_onshore_wind.sort_values(by = f'{self.region}_onshore', ascending = False, ignore_index = True)
+            data_sorted_wind_off = data_offshore_wind.sort_values(by = f'{self.region}_offshore', ascending = False, ignore_index=True)
+            data_sorted_solar = data_solar.sort_values(by = f'{self.region}_solar', ascending = False, ignore_index = True)
 
             plt.plot(data_sorted_wind_on['wind_onshore_profile'], label = f'Onshore Wind - {y}', linestyle = linestyle[i], color='blue')
-            if not self.region == 'NO':
-                plt.plot(data_sorted_wind_off['wind_offshore_profile'], label = f'Offshore Wind - {y}', linestyle = linestyle[i], color='green')
-                plt.plot(data_sorted_solar['solar_profile'], label = f'Solar - {y}', linestyle = linestyle[i], color='orange')
+            plt.plot(data_sorted_wind_off['wind_offshore_profile'], label = f'Offshore Wind - {y}', linestyle = linestyle[i], color='green')
+            plt.plot(data_sorted_solar['solar_profile'], label = f'Solar - {y}', linestyle = linestyle[i], color='orange')
         plt.legend()
         plt.show()
 
 
 if __name__ == '__main__':
     # region = 'DK_1'
-    region = 'DK_2'
-    # region = 'NO'
+    # region = 'DK_2'
+    region = 'NO'
     # region = 'DE'
 
     years = [2017, 2018, 2019, 2020]
