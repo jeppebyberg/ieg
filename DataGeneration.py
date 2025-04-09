@@ -27,9 +27,12 @@ class DataGeneration:
         data = pd.read_csv('data/offshore_wind_1979-2017.csv', sep=';', index_col=0)
         data.index = pd.to_datetime(data.index)
         data = data[data.index.year == self.year]
-        if self.region == 'DK_1' or self.region == 'DK_2':
+        if self.region == 'DK_1':
             data = data[['DNK']]
-            data.rename(columns={'DNK': 'DK_offshore'}, inplace=True)
+            data.rename(columns={'DNK': 'DK_1_offshore'}, inplace=True)
+        elif self.region == 'DK_2':
+            data = data[['DNK']]
+            data.rename(columns={'DNK': 'DK_2_offshore'}, inplace=True)
         elif self.region == 'NO':
             data = data[['NOR']]
             data.rename(columns={'NOR': 'NO_offshore'}, inplace=True)
@@ -46,14 +49,17 @@ class DataGeneration:
         data = pd.read_csv('data/onshore_wind_1979-2017.csv', sep=';', index_col=0)
         data.index = pd.to_datetime(data.index)
         if self.year > 2017:
-            print("Year is greater than 2017, using data from last available year.")
+            print(f"Year {self.year} is greater than 2017, using data from last available year.")
             data = data[data.index.year == self.year]
         else:
             data = data[data.index.year == 2017]
         # Filter the data for the selected region
-        if self.region == 'DK_1' or self.region == 'DK_2':
+        if self.region == 'DK_1':
             data = data[['DNK']]
-            data.rename(columns={'DNK': 'DK_onshore'}, inplace=True)
+            data.rename(columns={'DNK': 'DK_1_onshore'}, inplace=True)
+        elif self.region == 'DK_2':
+            data = data[['DNK']]
+            data.rename(columns={'DNK': 'DK_2_onshore'}, inplace=True)
         elif self.region == 'NO':
             data = data[['NOR']]
             data.rename(columns={'NOR': 'NO_onshore'}, inplace=True)

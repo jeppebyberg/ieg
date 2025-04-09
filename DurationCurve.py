@@ -25,18 +25,18 @@ class DurationCurve():
             data_sorted_wind_off = data_offshore_wind.sort_values(by = f'{self.region}_offshore', ascending = False, ignore_index=True)
             data_sorted_solar = data_solar.sort_values(by = f'{self.region}_solar', ascending = False, ignore_index = True)
 
-            plt.plot(data_sorted_wind_on['wind_onshore_profile'], label = f'Onshore Wind - {y}', linestyle = linestyle[i], color='blue')
-            plt.plot(data_sorted_wind_off['wind_offshore_profile'], label = f'Offshore Wind - {y}', linestyle = linestyle[i], color='green')
-            plt.plot(data_sorted_solar['solar_profile'], label = f'Solar - {y}', linestyle = linestyle[i], color='orange')
+            plt.plot(data_sorted_wind_on, label = f'Onshore Wind - {y}', linestyle = linestyle[i], color='blue')
+            plt.plot(data_sorted_wind_off, label = f'Offshore Wind - {y}', linestyle = linestyle[i], color='green')
+            plt.plot(data_sorted_solar, label = f'Solar - {y}', linestyle = linestyle[i], color='orange')
         plt.legend()
         plt.show()
 
 
 if __name__ == '__main__':
     # region = 'DK_1'
-    # region = 'DK_2'
-    region = 'NO'
+    region = 'DK_2'
+    # region = 'NO'
     # region = 'DE'
 
-    years = [2017, 2018, 2019, 2020]
+    years = [2015, 2016, 2017]
     tmp = DurationCurve(years = years, region = region)
