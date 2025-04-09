@@ -24,6 +24,7 @@ class CostGeneration:
 
         costs.at["OCGT", "fuel"] = costs.at["gas", "fuel"]
         costs.at["CCGT", "fuel"] = costs.at["gas", "fuel"]
+        costs.at['offshorewind', ]
         costs.at["OCGT", "CO2 intensity"] = costs.at["gas", "CO2 intensity"]
         costs.at["CCGT", "CO2 intensity"] = costs.at["gas", "CO2 intensity"]
 

@@ -29,8 +29,8 @@ class DurationCurve():
             plt.plot(data_sorted_wind_off, label = f'Offshore Wind - {y}', linestyle = linestyle[i], color='green')
             plt.plot(data_sorted_solar, label = f'Solar - {y}', linestyle = linestyle[i], color='orange')
         plt.legend()
+        plt.ylim(0, 1.1)
         plt.show()
-
 
 if __name__ == '__main__':
     # region = 'DK_1'
