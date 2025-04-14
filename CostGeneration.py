@@ -24,7 +24,6 @@ class CostGeneration:
 
         costs.at["OCGT", "fuel"] = costs.at["gas", "fuel"]
         costs.at["CCGT", "fuel"] = costs.at["gas", "fuel"]
-        costs.at['offshorewind', ]
         costs.at["OCGT", "CO2 intensity"] = costs.at["gas", "CO2 intensity"]
         costs.at["CCGT", "CO2 intensity"] = costs.at["gas", "CO2 intensity"]
 
@@ -32,9 +31,6 @@ class CostGeneration:
         costs["marginal_cost"] = costs["VOM"] + costs["fuel"] / costs["efficiency"]
         annuity = costs.apply(lambda x: self.annuity(x["discount rate"], x["lifetime"]), axis=1)
         costs["capital_cost"] = (annuity + costs["FOM"] / 100) * costs["investment"]
-        costs.at["onwind", "capital_cost"] #EUR/MW/a
-        costs.at["solar", "capital_cost"] #EUR/MW/a
-        costs.at["CCGT", "CO2 intensity"] #tCO2/MWh_th
         return costs
         
     @staticmethod
@@ -42,10 +38,11 @@ class CostGeneration:
         return r / (1.0 - 1.0 / (1.0 + r) ** n)
 
 if __name__ == "__main__":
-    CG = CostGeneration()
+    CG = CostGeneration(year = 2030)
     costs = CG.costs
     carriers = [
         "onwind",
+        'offwind',
         "solar",
         "OCGT",
         "CCGT",
@@ -53,3 +50,4 @@ if __name__ == "__main__":
     ]
     # example on how to use costs in main:
     co2_emissions=[costs.at[c, "CO2 intensity"] for c in carriers]
+    capital_costs=[costs.at[c, 'capital_cost'] for c in carriers]

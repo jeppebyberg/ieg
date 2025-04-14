@@ -32,6 +32,7 @@ class DataGeneration:
         else:
             data = data[data.index.year == self.year]
         if self.region == 'DK':
+            data = data[['DNK']]
             data.rename(columns={'DNK': 'DK_offshore'}, inplace=True)
         elif self.region == 'NO':
             data = data[['NOR']]
@@ -99,6 +100,6 @@ if __name__ == "__main__":
     region = 'DK'
 
     year = 2017
-    tmp = DataGeneration(year = year, region = region).onshore_wind
+    tmp = DataGeneration(year = year, region = region)
 
 
