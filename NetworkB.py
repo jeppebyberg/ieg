@@ -3,15 +3,15 @@ import pandas as pd
 from DataGeneration import DataGeneration
 from CostGeneration import CostGeneration
 
-
-class BuildBaseNetwork:
+class NetworkB:
     def __init__(self, year: int = 2019, cost_year: int = 2030,
                  setup: dict = {'DK': 
                             {'OCGT': True,
                             'CCGT': True,
                             'battery storage': True,
                             'onwind': True,
-                            'solar': True}}):
+                            'solar': True}},
+                 CO2_limit: float = 5000000):
         
         self.year = year
 
@@ -19,6 +19,9 @@ class BuildBaseNetwork:
         self.costs = CostGeneration(year = self.cost_year).costs
 
         self.setup = setup
+
+        self.CO2_limit = CO2_limit
+
         self.regions = setup.keys()
         
         self.network = pypsa.Network()
@@ -31,6 +34,14 @@ class BuildBaseNetwork:
         self.network.add("Carrier", self.carriers, color=["dodgerblue", "gold", "indianred", "yellow-green"], co2_emissions=[self.costs.at[c, "CO2 intensity"] for c in self.carriers])
 
         self.add_regions()
+
+        self.network.add(
+            "GlobalConstraint",
+            "CO2Limit",
+            carrier_attribute="co2_emissions",
+            sense="<=",
+            constant=self.CO2_limit, #5MtCO2
+        )
 
         self.network.optimize(solver_name="gurobi",solver_options={"OutputFlag": 0})
 
