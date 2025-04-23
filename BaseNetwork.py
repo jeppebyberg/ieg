@@ -97,3 +97,21 @@ class BuildBaseNetwork:
             return r/(1. - 1./(1.+r)**n)
         else:
             return 1/n
+if __name__ == "__main__":
+    setup = {'DK': 
+                    {'OCGT': True,
+                    'CCGT': False,
+                    'battery storage': False,
+                    'onwind': True,
+                    'offwind': True,
+                    'solar': True},
+            'DE': 
+                    {'OCGT': True,
+                     'solar': True,
+                    'offwind': True,
+                    'onwind': True,}
+                    # 'CCGT': True},
+                    }
+
+    tmp = BuildBaseNetwork(setup = setup, cost_year = 2030, year = 2017, demand_year= 2017)
+    print(tmp.network.generators.p_nom_opt)

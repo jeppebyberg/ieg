@@ -10,6 +10,9 @@ class PlotDispatch():
     def plot_dispatch(self):
         generators = self.base_network.network.generators.p_nom_opt.keys()
 
+        # SAVE AND OVERWRITE PLOTS?
+        save_plots = False
+
         for region in self.base_network.regions:
 
             plt.figure(figsize=(10, 5))
@@ -21,7 +24,8 @@ class PlotDispatch():
             plt.ylabel('Generation in MWh')
             plt.grid(True, which='major',alpha=0.25)
             plt.legend()
-            #plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
+            if save_plots:
+                plt.savefig(f'./Plots/dispatch_{region}_winter.png', dpi=300, bbox_inches='tight')
             plt.show()
 
             plt.figure(figsize=(10, 5))
@@ -33,7 +37,8 @@ class PlotDispatch():
             plt.ylabel('Generation in MWh')
             plt.legend()
             plt.grid(True, which='major',alpha=0.25)
-            #plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
+            if save_plots:
+                plt.savefig(f'./Plots/dispatch_{region}_summer.png', dpi=300, bbox_inches='tight')
             plt.show()
 
 if __name__ == "__main__":
