@@ -1,9 +1,10 @@
 import pandas as pd
 
 class DataGeneration:
-    def __init__(self, year: int = 2019, region: str = 'DK'):
+    def __init__(self, year: int = 2019, demand_year: int=2017, region: str = 'DK'):
 
         self.year = year # default year is 2019
+        self.demand_year = demand_year # default demand year is 2017
         self.region = region # default region is DK1
         self.demand = self.load_data()
         self.offshore_wind = self.offshore_wind_data()
@@ -13,7 +14,7 @@ class DataGeneration:
     def load_data(self):
         data = pd.read_csv('data/time_series_60min_singleindex_filtered (4).csv', index_col=0)
         data.index = pd.to_datetime(data.index)        
-        data = data[data.index.year == self.year]
+        data = data[data.index.year == self.demand_year]
         data = data.fillna(0)
 
         # # Filter the data for the selected region
@@ -100,6 +101,6 @@ if __name__ == "__main__":
     region = 'DK'
 
     year = 2017
-    tmp = DataGeneration(year = year, region = region)
+    tmp = DataGeneration(year = year, demand_year= 2017, region = region)
 
 

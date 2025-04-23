@@ -5,7 +5,7 @@ from CostGeneration import CostGeneration
 
 
 class BuildBaseNetwork:
-    def __init__(self, year: int = 2019, cost_year: int = 2030,
+    def __init__(self, year: int = 2019, cost_year: int = 2030, demand_year: int = 2017,
                  setup: dict = {'DK': 
                             {'OCGT': True,
                             'CCGT': True,
@@ -14,6 +14,7 @@ class BuildBaseNetwork:
                             'solar': True}}):
         
         self.year = year
+        self.demand_year = demand_year
 
         self.cost_year = cost_year 
         self.costs = CostGeneration(year = self.cost_year).costs
@@ -36,7 +37,7 @@ class BuildBaseNetwork:
 
     def add_regions(self):
         for region in self.regions:
-            data = DataGeneration(year = self.year, region = region)
+            data = DataGeneration(year = self.year, demand_year=self.demand_year, region = region)
             self.data_dict[region]['Demand'] = data.demand
             self.data_dict[region]['solar'] = data.solar
             self.data_dict[region]['onwind'] = data.onshore_wind
