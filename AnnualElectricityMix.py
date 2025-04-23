@@ -20,9 +20,9 @@ class AnnualElectricityMix():
                         sizes.append(self.base_network.network.generators.p_nom_opt[generator].sum())
             plt.pie(sizes,
             labels=labels,
-            wedgeprops={'linewidth':0})
+            wedgeprops={'linewidth':0},autopct='%1.1f%%')
             plt.axis('equal')
-            plt.title(f'Electricity mix {region}', y=1.07)
+            plt.title(f'Electricity mix - {region}', y=1.07)
             #plt.savefig(f'./Plots/electricity_mix_{region}.png', dpi=300, bbox_inches='tight')
             plt.show()
 
@@ -44,3 +44,4 @@ if __name__ == "__main__":
     tmp.network.optimize(solver_name="gurobi",solver_options={"OutputFlag": 0})
 
     PlotAnnualElectricityMix = AnnualElectricityMix(tmp)
+    PlotAnnualElectricityMix.plot_electricity_mix()

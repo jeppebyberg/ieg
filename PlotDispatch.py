@@ -17,7 +17,9 @@ class PlotDispatch():
                 if generator.split(' ')[1] == region:
                     if self.base_network.network.generators.p_nom_opt[generator].sum() > 10:
                         plt.plot(self.base_network.network.generators_t.p[generator][0:7 * 24], label=generator.split(' ')[0])
-            plt.title(f'Dispatch Winter {region}', y=1.07)
+            plt.title(f'Dispatch Winter - {region}', y=1.07)
+            plt.ylabel('Generation in MWh')
+            plt.grid(True, which='major',alpha=0.25)
             plt.legend()
             #plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
             plt.show()
@@ -27,8 +29,10 @@ class PlotDispatch():
                 if generator.split(' ')[1] == region:
                     if self.base_network.network.generators.p_nom_opt[generator].sum() > 10:
                         plt.plot(self.base_network.network.generators_t.p[generator][4993: 4993 + 7 * 24], label=generator.split(' ')[0])
-            plt.title(f'Dispatch Summer {region}', y=1.07)
+            plt.title(f'Dispatch Summer - {region}', y=1.07)
+            plt.ylabel('Generation in MWh')
             plt.legend()
+            plt.grid(True, which='major',alpha=0.25)
             #plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
             plt.show()
 
