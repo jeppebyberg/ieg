@@ -23,7 +23,7 @@ class AnnualElectricityMix():
             wedgeprops={'linewidth':0})
             plt.axis('equal')
             plt.title(f'Electricity mix {region}', y=1.07)
-            plt.savefig(f'./Plots/electricity_mix_{region}.png', dpi=300, bbox_inches='tight')
+            #plt.savefig(f'./Plots/electricity_mix_{region}.png', dpi=300, bbox_inches='tight')
             plt.show()
 
 if __name__ == "__main__":

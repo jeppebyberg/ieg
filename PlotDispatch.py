@@ -19,7 +19,7 @@ class PlotDispatch():
                         plt.plot(self.base_network.network.generators_t.p[generator][0:7 * 24], label=generator.split(' ')[0])
             plt.title(f'Dispatch Winter {region}', y=1.07)
             plt.legend()
-            plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
+            #plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
             plt.show()
 
             plt.figure(figsize=(10, 5))
@@ -29,7 +29,7 @@ class PlotDispatch():
                         plt.plot(self.base_network.network.generators_t.p[generator][4993: 4993 + 7 * 24], label=generator.split(' ')[0])
             plt.title(f'Dispatch Summer {region}', y=1.07)
             plt.legend()
-            plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
+            #plt.savefig(f'./Plots/dispatch_{region}.png', dpi=300, bbox_inches='tight')
             plt.show()
 
 if __name__ == "__main__":
