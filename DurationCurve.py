@@ -13,6 +13,11 @@ class DurationCurve():
         plt.figure(figsize=(10, 6))
         plt.title(f'Duration Curves of Wind and Solar Profiles for {self.region} in {self.years}')
 
+
+        # Save figures?? 
+        save_fig = False
+        save_path = f'./plots/DurationCurve_{self.region}.png'
+
         linestyle = ['-', '--', ':', '-.', '-']  
 
         for i, y in enumerate(self.years):
@@ -30,6 +35,10 @@ class DurationCurve():
             plt.plot(data_sorted_solar, label = f'Solar - {y}', linestyle = linestyle[i], color='orange')
         plt.legend()
         plt.ylim(0, 1.1)
+        plt.xlabel('Hours of the Year')
+        plt.ylabel('Generation Capacity (p.u.)')
+        if save_fig:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.show()
 
 if __name__ == '__main__':
