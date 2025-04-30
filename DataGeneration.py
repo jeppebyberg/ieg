@@ -1,7 +1,7 @@
 import pandas as pd
 
 class DataGeneration:
-    def __init__(self, year: int = 2019, demand_year: int=2019, region: str = 'DK'):
+    def __init__(self, year: int = 2019, demand_year: int=2017, region: str = 'DK'):
 
         self.year = year # default year is 2019
         self.demand_year = demand_year # default demand year is 2017
@@ -96,11 +96,13 @@ if __name__ == "__main__":
 
     # region = 'DK_1'
     # region = 'DK_2'
-    region = 'NO'
+    # region = 'NO'
     # region = 'DE'
     region = 'DK'
 
     year = 2017
-    tmp = DataGeneration(year = year, demand_year= 2017, region = region)
+    tmp = DataGeneration(year = year, demand_year= 2019, region = region)
+
+    print(tmp.demand)
 
 
