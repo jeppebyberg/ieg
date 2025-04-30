@@ -33,7 +33,7 @@ class BuildBaseNetwork:
 
         self.add_regions()
 
-        self.network.optimize(solver_name="gurobi",solver_options={"OutputFlag": 0})
+        #self.network.optimize(solver_name="gurobi",solver_options={"OutputFlag": 0})
 
     def add_regions(self):
         for region in self.regions:
@@ -74,7 +74,8 @@ class BuildBaseNetwork:
         elif tech == 'onwind':
             self.network.add("Generator", f'{tech} {region}', 
                                 bus = f'electricity bus {region}', 
-                                p_nom_extendable=True, 
+                                p_nom_extendable=True,
+                                p_nom_max = 0, # 5 GW limit 
                                 carrier='onwind', 
                                 capital_cost = self.costs.at[tech, "capital_cost"], 
                                 marginal_cost = self.costs.at[tech, "marginal_cost"],
