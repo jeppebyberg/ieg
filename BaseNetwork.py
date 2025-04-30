@@ -5,7 +5,7 @@ from CostGeneration import CostGeneration
 
 
 class BuildBaseNetwork:
-    def __init__(self, year: int = 2019, cost_year: int = 2030, demand_year: int = 2017,
+    def __init__(self, year: int = 2019, cost_year: int = 2030, demand_year: int = 2019,
                  setup: dict = {'DK': 
                             {'OCGT': True,
                             'CCGT': True,
