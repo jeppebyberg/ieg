@@ -34,7 +34,7 @@ class CostGeneration:
         costs["marginal_cost"] = costs["VOM"] + costs["fuel"] / costs["efficiency"]
         annuity = costs.apply(lambda x: self.annuity(x["discount rate"], x["lifetime"]), axis=1)
         costs["capital_cost"] = (annuity + costs["FOM"] / 100) * costs["investment"]
-        return costs
+        return costs 
         
     @staticmethod
     def annuity(r, n):
