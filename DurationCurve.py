@@ -18,7 +18,7 @@ class DurationCurve():
         save_fig = False
         save_path = f'./plots/DurationCurve_{self.region}.png'
 
-        linestyle = ['-', '--', ':', '-.', '-']  
+        linestyle = ['-', '--', ':', '-.', '-', '--', ':', '-.']  
 
         for i, y in enumerate(self.years):
             data = DataGeneration(year = y, region = self.region)
@@ -42,8 +42,8 @@ class DurationCurve():
         plt.show()
 
 if __name__ == '__main__':
-    # region = 'DK_1'
-    region = 'DK_2'
+    region = 'DK'
+    # region = 'DK_2'
     # region = 'NO'
     # region = 'DE'
 

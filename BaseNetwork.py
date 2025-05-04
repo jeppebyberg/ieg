@@ -24,6 +24,9 @@ class BuildBaseNetwork:
         
         self.network = pypsa.Network()
         self.hours_in_year = pd.date_range(f'{year}-01-01 00:00', f'{year}-12-31 23:00', freq='h')
+        if len(self.hours_in_year) > 8760:
+            self.hours_in_year = self.hours_in_year[:8760]  # Cut off extra Feb 29
+        self.hours_in_year = self.hours_in_year
         self.network.set_snapshots(self.hours_in_year.values)
 
         self.data_dict = {region : {} for region in self.regions}
