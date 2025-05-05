@@ -1,10 +1,11 @@
 import pypsa
 import pandas as pd
 from DataGeneration import DataGeneration
+from HeatingDemand import HeatingDemand
 from CostGeneration import CostGeneration
 
 
-class ExpandedNetwork:
+class ExpandedHeatNetwork:
     def __init__(self, year: int = 2017, cost_year: int = 2030, demand_year: int = 2019,
                  setup: dict = {'DK': 
                             {'OCGT': True,
@@ -14,6 +15,7 @@ class ExpandedNetwork:
                             'electrolysis': True,
                             'fuel cell': True,
                             'H2 (l) storage tank': True,
+                            'industrial heat pump high temperature': True,
                             }}):
         
         self.year = year
@@ -21,6 +23,8 @@ class ExpandedNetwork:
 
         self.cost_year = cost_year 
         self.costs = CostGeneration(year = self.cost_year).costs
+
+        self.heating_demand = HeatingDemand().heating_demand_mw
 
         self.setup = setup
         self.regions = setup.keys()
@@ -59,6 +63,8 @@ class ExpandedNetwork:
 
             self.add_hydrogen_bus(region) # add hydrogen bus to region bus
 
+            self.add_heat_bus(region) # add heat bus to region bus
+
             technologies = self.setup[region].keys()
             for tech in technologies:
                 if self.setup[region][tech]:
@@ -75,6 +81,13 @@ class ExpandedNetwork:
         self.network.add("Bus", f'hydrogen bus {region}', carrier='hydrogen',
                     x = self.coordinates[region][1], 
                     y = self.coordinates[region][0])
+
+    def add_heat_bus(self, region):
+        self.network.add("Bus", f'heat bus {region}', carrier='heat',
+                    x = self.coordinates[region][1], 
+                    y = self.coordinates[region][0])
+
+        self.network.add("Load", f'heat load {region}', bus = f'heat bus {region}', p_set = self.heating_demand[region].values.flatten())
 
     def add_network_technologies(self, region, tech):
         if tech in ['OCGT', 'CCGT']:
@@ -116,29 +129,39 @@ class ExpandedNetwork:
                                 e_nom_extendable=True, 
                                 e_cyclic = True,
                                 capital_cost = self.costs.at[tech, "capital_cost"])
-
-        elif tech == 'electrolysis':
-            self.network.add("Link", f'{tech} {region}', 
-                                bus0 = f'electricity bus {region}',
-                                bus1 = f'hydrogen bus {region}',
-                                p_nom_extendable=True, 
-                                capital_cost = self.costs.at[tech, "capital_cost"], 
-                                # capital_cost = 0, 
-                                efficiency = self.costs.at[tech, "efficiency"])
-        elif tech == 'fuel cell':
-            self.network.add("Link", f'{tech} {region}', 
-                                bus0 = f'hydrogen bus {region}',
-                                bus1 = f'electricity bus {region}',
-                                p_nom_extendable=True, 
-                                capital_cost = self.costs.at[tech, "capital_cost"], 
-                                # capital_cost = 0, 
-                                efficiency = self.costs.at[tech, "efficiency"])
         elif tech == 'H2 (l) storage tank':
             self.network.add("Store", f'{tech} {region}',
                                 bus = f'hydrogen bus {region}',
                                 e_nom_extendable=True, 
                                 e_cyclic = True,
                                 capital_cost = self.costs.at[tech, "capital_cost"])
+        elif tech == 'electrolysis':
+            self.network.add("Link", f'{tech} to H2 {region}', 
+                                bus0 = f'electricity bus {region}',
+                                bus1 = f'hydrogen bus {region}',
+                                p_nom_extendable=True, 
+                                capital_cost = self.costs.at[tech, "capital_cost"], 
+                                efficiency = self.costs.at[tech, "efficiency"])
+            self.network.add("Link", f'{tech} to heat {region}',
+                                bus0 = f'electricity bus {region}',
+                                bus1 = f'heat bus {region}',
+                                p_nom_extendable=True,
+                                efficiency = self.costs.at[tech, "efficiency-heat"])
+            
+        elif tech == 'fuel cell':
+            self.network.add("Link", f'{tech} {region}', 
+                                bus0 = f'hydrogen bus {region}',
+                                bus1 = f'electricity bus {region}',
+                                p_nom_extendable=True, 
+                                capital_cost = self.costs.at[tech, "capital_cost"], 
+                                efficiency = self.costs.at[tech, "efficiency"])
+        elif tech == 'industrial heat pump high temperature':
+            self.network.add("Link", f'{tech} {region}', 
+                                bus0 = f'electricity bus {region}',
+                                bus1 = f'heat bus {region}',
+                                p_nom_extendable=True,
+                                capital_cost = self.costs.at[tech, "capital_cost"],
+                                efficiency = self.costs.at[tech, "efficiency"])
 
     @staticmethod
     def annuity(n, r):
