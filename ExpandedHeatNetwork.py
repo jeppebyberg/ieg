@@ -98,23 +98,45 @@ class ExpandedHeatNetwork:
                                 capital_cost = self.costs.at[tech, "capital_cost"], 
                                 marginal_cost = self.costs.at[tech, "marginal_cost"])
         elif tech == 'solar':
-            self.network.add("Generator",
-                                f'{tech} {region}', 
-                                bus = f'electricity bus {region}', 
-                                p_nom_extendable=True, 
-                                carrier='solar', 
-                                capital_cost = self.costs.at[tech, "capital_cost"], 
-                                marginal_cost = self.costs.at[tech, "marginal_cost"],
-                                p_max_pu = self.data_dict[region]['solar'].values.flatten())
+            if region == 'DE':
+                self.network.add("Generator",
+                    f'{tech} {region}', 
+                    bus = f'electricity bus {region}', 
+                    p_nom_extendable=True, 
+                    p_nom_max = 75000, # 75 GW limit
+                    carrier='solar', 
+                    capital_cost = self.costs.at[tech, "capital_cost"], 
+                    marginal_cost = self.costs.at[tech, "marginal_cost"],
+                    p_max_pu = self.data_dict[region]['solar'].values.flatten())
+            else:
+                self.network.add("Generator",
+                    f'{tech} {region}', 
+                    bus = f'electricity bus {region}', 
+                    p_nom_extendable=True, 
+                    carrier='solar', 
+                    capital_cost = self.costs.at[tech, "capital_cost"], 
+                    marginal_cost = self.costs.at[tech, "marginal_cost"],
+                    p_max_pu = self.data_dict[region]['solar'].values.flatten())
+
         elif tech == 'onwind':
-            self.network.add("Generator", f'{tech} {region}', 
-                                bus = f'electricity bus {region}', 
-                                p_nom_extendable=True,
-                                p_nom_max = 5500, # 5.5 GW limit 
-                                carrier='onwind', 
-                                capital_cost = self.costs.at[tech, "capital_cost"], 
-                                marginal_cost = self.costs.at[tech, "marginal_cost"],
-                                p_max_pu = self.data_dict[region]['onwind'].values.flatten())  
+            if region == 'DK':
+                self.network.add("Generator", f'{tech} {region}', 
+                                    bus = f'electricity bus {region}', 
+                                    p_nom_extendable=True,
+                                    p_nom_max = 5500, # 5.5 GW limit 
+                                    carrier='onwind', 
+                                    capital_cost = self.costs.at[tech, "capital_cost"], 
+                                    marginal_cost = self.costs.at[tech, "marginal_cost"],
+                                    p_max_pu = self.data_dict[region]['onwind'].values.flatten())  
+            else:
+                self.network.add("Generator", f'{tech} {region}', 
+                    bus = f'electricity bus {region}', 
+                    p_nom_extendable=True,
+                    # p_nom_max = 5500, # 5.5 GW limit 
+                    carrier='onwind', 
+                    capital_cost = self.costs.at[tech, "capital_cost"], 
+                    marginal_cost = self.costs.at[tech, "marginal_cost"],
+                    p_max_pu = self.data_dict[region]['onwind'].values.flatten())  
         elif tech == 'offwind':
             self.network.add("Generator", f'{tech} {region}', 
                                 bus = f'electricity bus {region}', 
@@ -136,17 +158,14 @@ class ExpandedHeatNetwork:
                                 e_cyclic = True,
                                 capital_cost = self.costs.at[tech, "capital_cost"])
         elif tech == 'electrolysis':
-            self.network.add("Link", f'{tech} to H2 {region}', 
-                                bus0 = f'electricity bus {region}',
-                                bus1 = f'hydrogen bus {region}',
-                                p_nom_extendable=True, 
-                                capital_cost = self.costs.at[tech, "capital_cost"], 
-                                efficiency = self.costs.at[tech, "efficiency"])
-            self.network.add("Link", f'{tech} to heat {region}',
-                                bus0 = f'electricity bus {region}',
-                                bus1 = f'heat bus {region}',
-                                p_nom_extendable=True,
-                                efficiency = self.costs.at[tech, "efficiency-heat"])
+            self.network.add("Link", f'{tech} {region}',
+                bus0=f"electricity bus {region}",  
+                bus1=f"hydrogen bus {region}",     
+                bus2=f"heat bus {region}",         
+                p_nom_extendable=True,
+                efficiency=self.costs.at[tech, "efficiency"],           
+                efficiency2=self.costs.at[tech, "efficiency-heat"],     
+                capital_cost=self.costs.at["electrolysis", "capital_cost"])
             
         elif tech == 'fuel cell':
             self.network.add("Link", f'{tech} {region}', 

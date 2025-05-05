@@ -24,7 +24,10 @@ class PlotInternationalDispatchSoCHeat:
         stores_t_e = network.stores_t.e.loc[ts]
         links_t_p0 = network.links_t.p0.loc[ts]
         links_t_p1 = network.links_t.p1.loc[ts]
+        links_t_p2 = network.links_t.p2.loc[ts]
         loads_t = network.loads_t.p.loc[ts]
+
+        
 
         # Infer regions from generator names (e.g., "OCGT DK")
         regions = set(bus.split()[-1] for bus in network.buses.index if "electricity bus" in bus)
@@ -34,10 +37,37 @@ class PlotInternationalDispatchSoCHeat:
             # Select components for region
             gen_cols = [col for col in generators_t.columns if col.endswith(region)]
             store_cols = [col for col in stores_t_p.columns if col.endswith(region)]
-            link_cols_p1 = [col for col in links_t_p1.columns if col.endswith(region)]
             link_cols_p0 = [col for col in links_t_p0.columns if col.endswith(region)]
+            link_cols_p1 = [col for col in links_t_p1.columns if col.endswith(region)]
+            link_cols_p2 = [col for col in links_t_p2.columns if col.endswith(region)]
 
             region_loads = [col for col in loads_t.columns if col.endswith(region)]
+
+            gen_cols = [
+                col for col in gen_cols
+                if network.generators.p_nom_opt.get(col, 0) > 0
+            ]
+
+            # Keep only storage units with nonzero energy capacity
+            store_cols = [
+                col for col in store_cols
+                if network.stores.e_nom_opt.get(col, 0) > 0
+            ]
+            # Filter links by installed capacity
+            link_cols_p0 = [
+                col for col in link_cols_p0
+                if network.links.p_nom_opt.get(col, 0) > 0
+            ]
+            
+            link_cols_p1 = [
+                col for col in link_cols_p1
+                if network.links.p_nom_opt.get(col, 0) > 0
+            ]
+
+            link_cols_p2 = [
+                col for col in link_cols_p2
+                if network.links.p_nom_opt.get(col, 0) > 0
+            ]
             # Electricity load (e.g., 'load DK', not starting with 'heat')
             load_cols_electric = [col for col in region_loads if not col.startswith("heat")]
 
@@ -67,9 +97,9 @@ class PlotInternationalDispatchSoCHeat:
             for col in link_cols_p0:
                 if "electrolysis" in col:
                     name = col.replace(f" {region}", "")
-                    bat_charge_df["electrolyzer"] = links_t_p0[col]
+                    bat_charge_df["electrolyzer"] = -links_t_p0[col]
                 if "industrial heat pump high temperature" in col:
-                    bat_charge_df["heat pump"] = links_t_p0[col]
+                    bat_charge_df["heat pump"] = -links_t_p0[col]
             bat_charge_df = bat_charge_df.fillna(0)
             bat_charge_df = bat_charge_df.sort_index(axis=1)
 
@@ -106,12 +136,25 @@ class PlotInternationalDispatchSoCHeat:
                 gen_df[f"Import {other_region}"] = import_flow
                 bat_charge_df[f"Export {other_region}"] = export_flow
 
-            # Heat supply from links (e.g., electrolysis heat recovery)
-            heat_supply_cols = [col for col in links_t_p1.columns if "heat" in col and col.endswith(region)]
-            heat_supply_df = -links_t_p1[heat_supply_cols].copy()
+                heat_p1_cols = [
+                    col for col in network.links_t.p1.columns
+                    if "heat" in network.links.loc[col, "bus1"] and col.endswith(region)
+                ]
+                heat_df_p1 = network.links_t.p1[heat_p1_cols].copy()
 
-            # Clean column names
-            heat_supply_df.columns = [col.replace(f" {region}", "").replace("Link ", "") for col in heat_supply_df.columns]
+                # 2. Heat from p2 (e.g., electrolysis with heat recovery)
+                heat_p2_cols = [
+                    col for col in network.links_t.p2.columns
+                    if "heat" in network.links.loc[col, "bus2"] and col.endswith(region)
+                ]
+                heat_df_p2 = network.links_t.p2[heat_p2_cols].copy()
+
+                # 3. Combine both
+                heat_supply_df = -pd.concat([heat_df_p1, heat_df_p2], axis=1)
+
+            # 4. Clean column labels
+            heat_supply_df.columns = [col.replace(f" {region}", "") for col in heat_supply_df.columns]
+            heat_supply_df = heat_supply_df.loc[ts]
 
             # Create three subplots: electricity dispatch, storage SOC, and heat
             fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 12), sharex=True)
