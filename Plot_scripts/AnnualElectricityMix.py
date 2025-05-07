@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 from BaseNetwork import BuildBaseNetwork
 
 class AnnualElectricityMix():
-    def __init__(self, base_network: BuildBaseNetwork):
+    def __init__(self, base_network: BuildBaseNetwork, save_plots: bool = False):
         self.base_network = base_network      
+        self.save_plots = save_plots # SAVE AND OVERWRITE PLOTS?
 
         self.plot_electricity_mix()
 
@@ -32,7 +33,10 @@ class AnnualElectricityMix():
 
                 plt.axis('equal')
                 plt.title(f'Electricity mix - {region}', y=1.07)
-                #plt.savefig(f'./Plots/electricity_mix_{region}.png', dpi=300, bbox_inches='tight')
+                plt.tight_layout()
+
+                if self.save_plots:
+                    plt.savefig(f'./Plots/mix_{region}_section_D.png', dpi=300, bbox_inches='tight')
                 plt.show()
 
 if __name__ == "__main__":
