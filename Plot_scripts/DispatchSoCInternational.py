@@ -108,7 +108,9 @@ class PlotInternationalDispatchSoC:
                     gen_colors.append(self.network1.colors[gen_type])
                 else:
                     gen_colors.append(fallback_cmap(i % fallback_cmap.N))  # rotate through fallback colors
-            gen_labels = [' '.join(col.split(' ')[:-1]) for col in gen_df.columns]
+            gen_labels = [' '.join(col.split(' ')[:-1]) 
+              for col in gen_df.columns 
+              if col != "Import" and "Export" not in col]
 
             # Plot
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 9), sharex=True)
