@@ -1,7 +1,6 @@
 import pypsa
 import pandas as pd
 from DataGeneration import DataGeneration
-from HeatingDemand import HeatingDemand
 from CostGeneration import CostGeneration
 
 
@@ -23,8 +22,6 @@ class ExpandedHeatNetwork:
 
         self.cost_year = cost_year 
         self.costs = CostGeneration(year = self.cost_year).costs
-
-        self.heating_demand = HeatingDemand().heating_demand_mw
 
         self.setup = setup
         self.regions = setup.keys()
