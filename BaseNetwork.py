@@ -32,6 +32,12 @@ class BuildBaseNetwork:
         self.data_dict = {region : {} for region in self.regions}
 
         self.carriers = ['gas', 'onwind', 'offwind', 'solar']
+
+        self.colors = {'OCGT': 'gray',
+                       'onwind': 'lightblue',
+                       'offwind': 'dodgerblue',
+                        'solar': 'orange'}
+
         self.network.add("Carrier", self.carriers, color=["dodgerblue", "gold", "indianred", "yellow-green"], co2_emissions=[self.costs.at[c, "CO2 intensity"] for c in self.carriers])
 
         self.add_regions()
@@ -41,7 +47,7 @@ class BuildBaseNetwork:
     def add_regions(self):
         for region in self.regions:
             data = DataGeneration(year = self.year, demand_year=self.demand_year, region = region)
-            self.data_dict[region]['Demand'] = data.demand
+            self.data_dict[region]['Demand'] = data.demand 
             self.data_dict[region]['solar'] = data.solar
             self.data_dict[region]['onwind'] = data.onshore_wind
             self.data_dict[region]['offwind'] = data.offshore_wind 
@@ -78,7 +84,7 @@ class BuildBaseNetwork:
             self.network.add("Generator", f'{tech} {region}', 
                                 bus = f'electricity bus {region}', 
                                 p_nom_extendable=True,
-                                p_nom_max = 5500, # 5.5 GW limit 
+                                # p_nom_max = 5500, # 5.5 GW limit 
                                 carrier='onwind', 
                                 capital_cost = self.costs.at[tech, "capital_cost"], 
                                 marginal_cost = self.costs.at[tech, "marginal_cost"],

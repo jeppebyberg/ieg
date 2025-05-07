@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from ExpandedNetwork import ExpandedNetwork
 import pandas as pd
 
 class PlotInternationalDispatchSoC:
     def __init__(self, network: ExpandedNetwork, start: str, end: str):
         self.network = network.network
+        self.network1 = network
         self.start = start
         self.end = end
 
@@ -44,15 +46,15 @@ class PlotInternationalDispatchSoC:
             if any("battery" in c for c in store_cols):
                 for col in store_cols:
                     if "battery" in col:
-                        gen_df["battery storage"] = stores_t_p[col].clip(lower=0)
+                        gen_df[f"battery storage {region}"] = stores_t_p[col].clip(lower=0)
             if any("fuel cell" in c for c in link_cols_p1):
                 for col in link_cols_p1:
                     if "fuel cell" in col:
-                        gen_df["fuel cell"] = -links_t_p1[col]
+                        gen_df[f"fuel cell {region}"] = -links_t_p1[col]
             
 
             gen_df = gen_df.fillna(0)
-            gen_df.columns = [col.replace(f" {region}", "") for col in gen_df.columns]  # Remove region from labels
+            # gen_df.columns = [col.replace(f" {region}", "") for col in gen_df.columns]  # Remove region from labels
             gen_df = gen_df.sort_index(axis=1)
 
             # --------------------------
@@ -100,12 +102,22 @@ class PlotInternationalDispatchSoC:
                 gen_df[f"Import {other_region}"] = import_flow
                 bat_charge_df[f"Export {other_region}"] = export_flow
 
+            fallback_cmap = cm.get_cmap('tab20')  # or any other colormap
+            gen_colors = []
+            for i, col in enumerate(gen_df.columns):
+                gen_type = ' '.join(col.split(' ')[:-1])  # removes the final part (region)
+                if gen_type in self.network1.colors:
+                    gen_colors.append(self.network1.colors[gen_type])
+                else:
+                    gen_colors.append(fallback_cmap(i % fallback_cmap.N))  # rotate through fallback colors
+            gen_labels = [' '.join(col.split(' ')[:-1]) for col in gen_df.columns]
+
             # Plot
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 9), sharex=True)
             plt.suptitle(f"Dispatch and SOC – {region}")
 
             # Dispatch
-            ax1.stackplot(ts, gen_df.T.values, labels=gen_df.columns, alpha=0.7)
+            ax1.stackplot(ts, gen_df.T.values, labels=gen_labels, alpha=0.7, colors = gen_colors)
             ax1.plot(ts, total_load, label="Total Load", color="black", linestyle="--", linewidth=2)
             ax1.stackplot(ts, bat_charge_df.T.values, labels=bat_charge_df.columns, alpha=0.5)
 
