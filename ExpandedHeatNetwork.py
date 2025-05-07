@@ -108,45 +108,22 @@ class ExpandedHeatNetwork:
                                 capital_cost = self.costs.at[tech, "capital_cost"], 
                                 marginal_cost = self.costs.at[tech, "marginal_cost"])
         elif tech == 'solar':
-            if region == 'DE':
-                self.network.add("Generator",
-                    f'{tech} {region}', 
-                    bus = f'electricity bus {region}', 
-                    p_nom_extendable=True, 
-                    p_nom_max = 75000, # 75 GW limit
-                    carrier='solar', 
-                    capital_cost = self.costs.at[tech, "capital_cost"], 
-                    marginal_cost = self.costs.at[tech, "marginal_cost"],
-                    p_max_pu = self.data_dict[region]['solar'].values.flatten())
-            else:
-                self.network.add("Generator",
-                    f'{tech} {region}', 
-                    bus = f'electricity bus {region}', 
-                    p_nom_extendable=True, 
-                    carrier='solar', 
-                    capital_cost = self.costs.at[tech, "capital_cost"], 
-                    marginal_cost = self.costs.at[tech, "marginal_cost"],
-                    p_max_pu = self.data_dict[region]['solar'].values.flatten())
-
+            self.network.add("Generator",
+                f'{tech} {region}', 
+                bus = f'electricity bus {region}', 
+                p_nom_extendable=True, 
+                carrier='solar', 
+                capital_cost = self.costs.at[tech, "capital_cost"], 
+                marginal_cost = self.costs.at[tech, "marginal_cost"],
+                p_max_pu = self.data_dict[region]['solar'].values.flatten())
         elif tech == 'onwind':
-            if region == 'DK':
-                self.network.add("Generator", f'{tech} {region}', 
-                                    bus = f'electricity bus {region}', 
-                                    p_nom_extendable=True,
-                                    p_nom_max = 5500, # 5.5 GW limit 
-                                    carrier='onwind', 
-                                    capital_cost = self.costs.at[tech, "capital_cost"], 
-                                    marginal_cost = self.costs.at[tech, "marginal_cost"],
-                                    p_max_pu = self.data_dict[region]['onwind'].values.flatten())  
-            else:
-                self.network.add("Generator", f'{tech} {region}', 
-                    bus = f'electricity bus {region}', 
-                    p_nom_extendable=True,
-                    # p_nom_max = 5500, # 5.5 GW limit 
-                    carrier='onwind', 
-                    capital_cost = self.costs.at[tech, "capital_cost"], 
-                    marginal_cost = self.costs.at[tech, "marginal_cost"],
-                    p_max_pu = self.data_dict[region]['onwind'].values.flatten())  
+            self.network.add("Generator", f'{tech} {region}', 
+                bus = f'electricity bus {region}', 
+                p_nom_extendable=True,
+                carrier='onwind', 
+                capital_cost = self.costs.at[tech, "capital_cost"], 
+                marginal_cost = self.costs.at[tech, "marginal_cost"],
+                p_max_pu = self.data_dict[region]['onwind'].values.flatten())  
         elif tech == 'offwind':
             self.network.add("Generator", f'{tech} {region}', 
                                 bus = f'electricity bus {region}', 

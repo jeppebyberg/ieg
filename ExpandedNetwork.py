@@ -106,7 +106,6 @@ class ExpandedNetwork:
             self.network.add("Generator", f'{tech} {region}', 
                                 bus = f'electricity bus {region}', 
                                 p_nom_extendable=True,
-                                p_nom_max = 5500, # 5.5 GW limit 
                                 carrier='onwind', 
                                 capital_cost = self.costs.at[tech, "capital_cost"], 
                                 marginal_cost = self.costs.at[tech, "marginal_cost"],
