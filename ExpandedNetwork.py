@@ -62,6 +62,7 @@ class ExpandedNetwork:
             self.data_dict[region]['solar'] = data.solar
             self.data_dict[region]['onwind'] = data.onshore_wind
             self.data_dict[region]['offwind'] = data.offshore_wind 
+            self.data_dict[region]['Pumped-Storage-Hydro'] = data.hydro['Inflow_MW']
 
             self.add_electricity_busses(region) # add electricity bus to region bus
 
@@ -147,6 +148,53 @@ class ExpandedNetwork:
                                 e_nom_extendable=True, 
                                 e_cyclic = True,
                                 capital_cost = self.costs.at[tech, "capital_cost"])
+        elif tech == 'Pumped-Storage-Hydro-store':
+            if region == 'NO':
+                # 1. Virtual inflow bus for rain (no generator!)
+                self.network.add("Bus", f'rain inflow bus {region}',
+                    x=self.coordinates[region][1], 
+                    y=self.coordinates[region][0])
+
+                # 2. Add pumped hydro bus (for the storage and turbine)
+                self.network.add("Bus", f'pumped hydro bus {region}',
+                    x=self.coordinates[region][1], 
+                    y=self.coordinates[region][0])
+                
+                self.network.add("Generator", f'{tech}-rain-source {region}',
+                    bus=f'pumped hydro bus {region}',
+                    p_nom=1,
+                    p_nom_extendable=False,
+                    p_max_pu=self.data_dict[region]['Pumped-Storage-Hydro'].values.flatten(),  # inflow in MW
+                    marginal_cost=0
+                )
+
+                # 3. Store (the water reservoir)
+                self.network.add("Store", f'{tech} {region}',
+                    bus=f'pumped hydro bus {region}',
+                    e_nom_extendable=True,
+                    e_cyclic=True,
+                    capital_cost=self.costs.at[tech, "capital_cost"]
+                )
+
+                # 4. Link: rain inflow to store (acts like a source of constrained inflow)
+                self.network.add("Link", f'{tech}-rain-to-store {region}',
+                    bus0=f'rain inflow bus {region}',
+                    bus1=f'pumped hydro bus {region}',
+                    p_nom=1,
+                    p_nom_extendable=True,
+                    efficiency=1.0,
+                    marginal_cost=0,
+                    capital_cost=0  # optional: set if you want to cost inflow link
+                )
+
+                # 5. Link: discharge from store to grid
+                self.network.add("Link", f'{tech}-turbine {region}',
+                    bus0=f'pumped hydro bus {region}',   # storage output
+                    bus1=f'electricity bus {region}',    # grid
+                    p_nom_extendable=True,
+                    efficiency=self.costs.at["Pumped-Storage-Hydro-bicharger", "efficiency"],
+                    capital_cost=self.costs.at["Pumped-Storage-Hydro-bicharger", "capital_cost"]
+                )
 
     @staticmethod
     def annuity(n, r):

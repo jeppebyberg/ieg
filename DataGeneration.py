@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 class DataGeneration:
     def __init__(self, year: int = 2019, demand_year: int=2017, region: str = 'DK'):
@@ -14,6 +15,7 @@ class DataGeneration:
         self.onshore_wind = self.onshore_wind_data()
         self.solar = self.solar_data()
         self.heat_demand = self.heat_data()
+        self.hydro = self.hydro_storage_inflow()
 
     def load_data(self):
         data = pd.read_csv('data/time_series_60min_singleindex_filtered (4).csv', index_col=0)
@@ -123,8 +125,23 @@ class DataGeneration:
 
         return data
 
-    # def hydro_storage_inflow(self):
+    def hydro_storage_inflow(self):
+        data = pd.read_csv('data/Hydro_Inflow_NO.csv', sep=',')
+        data = data[data['Year'] == 2012].reset_index(drop=True)
 
+        data['Date'] = pd.to_datetime(data[['Year', 'Month', 'Day']])
+
+        data = data[data['Date'].dt.strftime('%m-%d') != '02-29']  # Remove leap day
+        # 1 GWh/day = 1000 MWh/day → divide by 24 = average MW
+        data['Hourly_MW'] = data['Inflow [GWh]'] * 1000 / 24
+
+        data = pd.DataFrame({
+            'datetime': data['Date'].repeat(24) + pd.to_timedelta(np.tile(range(24), len(data)), unit='h'),
+            'Inflow_MW': data['Hourly_MW'].repeat(24).values
+        })
+
+        return data
+    
 if __name__ == "__main__":
 
     region = 'DK'
@@ -135,7 +152,6 @@ if __name__ == "__main__":
 
     year = 2017
     tmp = DataGeneration(year = year, demand_year= 2019, region = region)
-
-    print(tmp.heat_demand)
+    tmp.hydro
 
 

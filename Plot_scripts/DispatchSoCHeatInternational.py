@@ -40,7 +40,6 @@ class PlotInternationalDispatchSoCHeat:
             link_cols_p0 = [col for col in links_t_p0.columns if col.endswith(region)]
             link_cols_p1 = [col for col in links_t_p1.columns if col.endswith(region)]
             link_cols_p2 = [col for col in links_t_p2.columns if col.endswith(region)]
-
             region_loads = [col for col in loads_t.columns if col.endswith(region)]
 
             gen_cols = [
@@ -79,10 +78,13 @@ class PlotInternationalDispatchSoCHeat:
             gen_df = generators_t[gen_cols].copy()
             for col in store_cols:
                 if "battery" in col:
-                    gen_df["battery storage"] = stores_t_p[col].clip(lower=0)
+                    gen_df[f"battery storage {region}"] = stores_t_p[col].clip(lower=0)
             for col in link_cols_p1:
                 if "fuel cell" in col:
-                    gen_df["fuel cell"] = -links_t_p1[col]
+                    gen_df[f"fuel cell {region}"] = -links_t_p1[col]
+            for col in link_cols_p1:
+                if "Pumped" in col:
+                    gen_df[f"Hydro energy {region}"] = -links_t_p1[col]
 
             gen_df = gen_df.fillna(0)
             gen_df.columns = [col.replace(f" {region}", "") for col in gen_df.columns]  # Remove region from labels
