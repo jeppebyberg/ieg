@@ -4,11 +4,12 @@ from ExpandedNetwork import ExpandedNetwork
 import pandas as pd
 
 class PlotDispatchSoC:
-    def __init__(self, network: ExpandedNetwork, start: str, end: str):
+    def __init__(self, network: ExpandedNetwork, start: str, end: str, save_plots: bool = False):
         self.network = network.network
         self.network1 = network
         self.start = start
         self.end = end
+        self.save_plots = save_plots # SAVE AND OVERWRITE PLOTS?
 
         self.plot_dispatch_and_soc(self.network, self.start, self.end)
 
@@ -113,4 +114,6 @@ class PlotDispatchSoC:
             ax2.grid(True)
 
             plt.tight_layout()
+            if self.save_plots:
+                plt.savefig(f'./Plots/dispatches_{region}_section_D.png', dpi=300, bbox_inches='tight')
             plt.show()

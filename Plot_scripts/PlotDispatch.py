@@ -2,16 +2,14 @@ import matplotlib.pyplot as plt
 from BaseNetwork import BuildBaseNetwork
 
 class PlotDispatch():
-    def __init__(self, base_network: BuildBaseNetwork):
+    def __init__(self, base_network: BuildBaseNetwork, save_plots: bool = False):
         self.base_network = base_network      
+        self.save_plots = save_plots # SAVE AND OVERWRITE PLOTS?
 
         self.plot_dispatch()
 
     def plot_dispatch(self):
         generators = self.base_network.network.generators.p_nom_opt.keys()
-
-        # SAVE AND OVERWRITE PLOTS?
-        save_plots = False
 
         for region in self.base_network.regions:
 
@@ -24,7 +22,7 @@ class PlotDispatch():
             plt.ylabel('Generation in MWh')
             plt.grid(True, which='major',alpha=0.25)
             plt.legend()
-            if save_plots:
+            if self.save_plots:
                 plt.savefig(f'./Plots/dispatch_{region}_winter.png', dpi=300, bbox_inches='tight')
             plt.show()
 
@@ -37,7 +35,7 @@ class PlotDispatch():
             plt.ylabel('Generation in MWh')
             plt.legend()
             plt.grid(True, which='major',alpha=0.25)
-            if save_plots:
+            if self.save_plots:
                 plt.savefig(f'./Plots/dispatch_{region}_summer.png', dpi=300, bbox_inches='tight')
             plt.show()
 
