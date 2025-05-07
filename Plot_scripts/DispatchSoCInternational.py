@@ -52,9 +52,7 @@ class PlotInternationalDispatchSoC:
                     if "fuel cell" in col:
                         gen_df[f"fuel cell {region}"] = -links_t_p1[col]
             
-
             gen_df = gen_df.fillna(0)
-            # gen_df.columns = [col.replace(f" {region}", "") for col in gen_df.columns]  # Remove region from labels
             gen_df = gen_df.sort_index(axis=1)
 
             # --------------------------
