@@ -11,20 +11,29 @@ class AnnualElectricityMix():
         generators = self.base_network.network.generators.p_nom_opt.keys()
 
         for region in self.base_network.regions:
-            labels = []
-            sizes = []
-            for generator in generators:
-                if generator.split(' ')[1] == region:
-                    if self.base_network.network.generators.p_nom_opt[generator] > 10:
-                        labels.append(generator.split(' ')[0])
-                        sizes.append(self.base_network.network.generators.p_nom_opt[generator].sum())
-            plt.pie(sizes,
-            labels=labels,
-            wedgeprops={'linewidth':0},autopct='%1.1f%%')
-            plt.axis('equal')
-            plt.title(f'Electricity mix - {region}', y=1.07)
-            #plt.savefig(f'./Plots/electricity_mix_{region}.png', dpi=300, bbox_inches='tight')
-            plt.show()
+                labels = []
+                sizes = []
+                for generator in generators:
+                    if generator.split(' ')[1] == region:
+                        if self.base_network.network.generators.p_nom_opt[generator] > 10:
+                            labels.append(generator.split(' ')[0])
+                            sizes.append(self.base_network.network.generators.p_nom_opt[generator].sum())
+
+                # Map each label to its color
+                colors = [self.base_network.colors[label] for label in labels]
+
+                plt.pie(
+                    sizes,
+                    labels=labels,
+                    wedgeprops={'linewidth': 0},
+                    autopct='%1.1f%%',
+                    colors=colors
+                )
+
+                plt.axis('equal')
+                plt.title(f'Electricity mix - {region}', y=1.07)
+                # plt.savefig(f'./Plots/electricity_mix_{region}.png', dpi=300, bbox_inches='tight')
+                plt.show()
 
 if __name__ == "__main__":
     setup = {'DK': 

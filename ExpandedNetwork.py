@@ -41,6 +41,14 @@ class ExpandedNetwork:
 
         self.carriers = ['gas', 'onwind', 'offwind', 'solar', 'hydrogen']
 
+        self.colors = {'OCGT': 'gray',
+                       'onwind': 'lightblue',
+                       'offwind': 'dodgerblue',
+                       'solar': 'orange',
+                       'battery storage': 'lightgreen',
+                       'electrolysis': 'brown',
+                       'fuel cell': 'purple',}
+        
         self.network.add("Carrier", self.carriers, co2_emissions=[self.costs.at[c, "CO2 intensity"] if c in self.costs.index else 0 for c in self.carriers])
 
         self.add_regions()

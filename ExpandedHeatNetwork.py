@@ -45,6 +45,14 @@ class ExpandedHeatNetwork:
 
         self.carriers = ['gas', 'onwind', 'offwind', 'solar', 'hydrogen']
 
+        self.colors = {'OCGT': 'gray',
+                       'onwind': 'lightblue',
+                       'offwind': 'dodgerblue',
+                       'solar': 'orange',
+                       'battery storage': 'lightgreen',
+                       'electrolysis': 'brown',
+                       'fuel cell': 'purple',}
+
         self.network.add("Carrier", self.carriers, co2_emissions=[self.costs.at[c, "CO2 intensity"] if c in self.costs.index else 0 for c in self.carriers])
 
         self.add_regions()
@@ -58,6 +66,7 @@ class ExpandedHeatNetwork:
             self.data_dict[region]['solar'] = data.solar
             self.data_dict[region]['onwind'] = data.onshore_wind
             self.data_dict[region]['offwind'] = data.offshore_wind 
+            self.data_dict[region]['heat_demand'] = data.heat_demand
 
             self.add_electricity_busses(region) # add electricity bus to region bus
 
@@ -87,7 +96,7 @@ class ExpandedHeatNetwork:
                     x = self.coordinates[region][1], 
                     y = self.coordinates[region][0])
 
-        self.network.add("Load", f'heat load {region}', bus = f'heat bus {region}', p_set = self.heating_demand[region].values.flatten())
+        self.network.add("Load", f'heat load {region}', bus = f'heat bus {region}', p_set = self.data_dict[region]['heat_demand'].values.flatten())
 
     def add_network_technologies(self, region, tech):
         if tech in ['OCGT', 'CCGT']:

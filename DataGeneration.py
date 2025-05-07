@@ -6,10 +6,14 @@ class DataGeneration:
         self.year = year # default year is 2019
         self.demand_year = demand_year # default demand year is 2017
         self.region = region # default region is DK1
+
+        self.demand_factor = {'DK': 1.55, 'NO': 1.21, 'DE': 1.11}
+
         self.demand = self.load_data()
         self.offshore_wind = self.offshore_wind_data()
         self.onshore_wind = self.onshore_wind_data()
         self.solar = self.solar_data()
+        self.heat_demand = self.heat_data()
 
     def load_data(self):
         data = pd.read_csv('data/time_series_60min_singleindex_filtered (4).csv', index_col=0)
@@ -21,6 +25,12 @@ class DataGeneration:
         data = data[[col for col in data.columns if col.startswith(self.region)]]
 
         data.rename(columns={f'{self.region}_load_actual_entsoe_transparency': self.region + '_demand'}, inplace=True)
+
+        demand_col = f'{self.region}_load_actual_entsoe_transparency'
+        new_demand_col = f'{self.region}_demand'
+        data.rename(columns={demand_col: new_demand_col}, inplace=True)
+
+        data[new_demand_col] *= self.demand_factor[self.region]
 
         return data
 
@@ -91,18 +101,41 @@ class DataGeneration:
 
         return data
 
+    def heat_data(self):
+        data = pd.read_csv('data/heat_demand.csv', sep=';', index_col=0)
+        data.index = pd.to_datetime(data.index)
+        if self.year > 2015:
+            data = data[data.index.year == 2015]
+        else:
+            data = data[data.index.year == self.year]
+        if self.region == 'DK':
+            data = data[['DNK']]
+            data.rename(columns={'DNK': 'DK_heat'}, inplace=True)
+        elif self.region == 'NO':
+            data = data[['NOR']]
+            data.rename(columns={'NOR': 'NO_heat'}, inplace=True)
+        elif self.region == 'DE':
+            data = data[['DEU']]
+            data.rename(columns={'DEU': 'DE_heat'}, inplace=True)
+        else:
+            raise ValueError(f"Region {self.region} not recognized.")
+        data = data.fillna(0)
+
+        return data
+
+    # def hydro_storage_inflow(self):
 
 if __name__ == "__main__":
 
-    # region = 'DK_1'
+    region = 'DK'
     # region = 'DK_2'
     # region = 'NO'
     # region = 'DE'
-    region = 'DK'
+    # region = 'DE'
 
     year = 2017
     tmp = DataGeneration(year = year, demand_year= 2019, region = region)
 
-    print(tmp.demand)
+    print(tmp.heat_demand)
 
 
